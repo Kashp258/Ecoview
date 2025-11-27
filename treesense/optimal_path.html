@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optimal Path Planning - EcoView Imaging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/assets/css/theme.css">
+<style>
+/* Hide page chrome when embedded in the dashboard iframe */
+.embed-mode .app-header,
+.embed-mode .app-footer { display: none; }
+.embed-mode main.container { padding-top: 0 !important; }
+</style>
+</head>
+<body>
+    <script>
+        // If this page is inside an iframe, enable embed mode to avoid double navbars
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('embed-mode');
+        }
+    </script>
+    <header class="app-header">
+        <div class="container app-header-inner">
+            <a class="brand" href="/index.html">
+                <div class="brand-icon">
+                    <img src="/images/treeicon.png" alt="EcoView Imaging logo">
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">EcoView</span>
+                    <span class="brand-tagline">Imaging</span>
+                </div>
+            </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <nav class="nav">
+                <div class="nav-items">
+                    <a href="/predict.html" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="/tree_species.html" class="nav-item">
+                        <span class="nav-icon">🌳</span>
+                        <span class="nav-text">Species</span>
+                    </a>
+                    <a href="/optimal_path.html" class="nav-item active">
+                        <span class="nav-icon">🗺️</span>
+                        <span class="nav-text">Optimal Path</span>
+                    </a>
+                    <a href="/historical_data.html" class="nav-item">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-text">History</span>
+                    </a>
+                    <a href="/settings.html" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                    <a href="/object_segmentation.html" class="nav-item">
+                        <span class="nav-icon">🌱</span>
+                        <span class="nav-text">Green Cover</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <div class="mobile-nav-overlay">
+            <nav class="mobile-nav">
+                <a href="/predict.html" class="mobile-nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+                <a href="/tree_species.html" class="mobile-nav-item"><span class="nav-icon">🌳</span><span class="nav-text">Species</span></a>
+                <a href="/optimal_path.html" class="mobile-nav-item"><span class="nav-icon">🗺️</span><span class="nav-text">Optimal Path</span></a>
+                <a href="/historical_data.html" class="mobile-nav-item"><span class="nav-icon">📈</span><span class="nav-text">History</span></a>
+                <a href="/settings.html" class="mobile-nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Settings</span></a>
+                <a href="/object_segmentation.html" class="mobile-nav-item"><span class="nav-icon">🌱</span><span class="nav-text">Green Cover</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 24px 0 40px;">
+<h2 style="margin-bottom: 12px;background:linear-gradient(135deg, var(--primary), var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">🗺️ Optimal Path Planning</h2>
+
+<div class="card section" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;">
+<label class="file-input" style="cursor:pointer;padding:16px;border:2px dashed var(--primary);background:rgba(74,222,128,0.1);flex:1;min-width:200px;">
+  <input type="file" id="image-file" accept="image/*" style="display:none;">
+  <span style="font-weight:600;">📁 Choose Terrain Image</span>
+  <span class="stat">JPG, PNG, WEBP supported</span>
+</label>
+<button class="btn btn-primary" onclick="processImage()">🚀 Calculate Path</button>
+</div>
+
+<h3>Processed Image:</h3>
+<div class="grid grid-2" style="margin-top: 12px;">
+  <img class="media" id="uploaded-image" src="" alt="Uploaded Image">
+  <img class="media" id="processed-image" src="" alt="Processed Image">
+</div>
+
+<!-- Removed percentage summaries per request -->
+<script>
+async function processImage() {
+  const fileInput = document.getElementById('image-file');
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const uploadedImage = document.getElementById('uploaded-image');
+  const processedImage = document.getElementById('processed-image');
+  // Percentages removed from UI
+
+  // Show the uploaded image immediately
+  const reader = new FileReader();
+  reader.onloadend = () => { uploadedImage.src = reader.result; };
+  reader.readAsDataURL(file);
+
+  const formData = new FormData();
+  formData.append('image', file);
+  try {
+    const res = await fetch('http://127.0.0.1:8000/process', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) { throw new Error(data.error || 'Processing failed'); }
+    processedImage.src = 'data:image/png;base64,' + data.image_base64;
+    // Meta can be used later if needed; UI elements removed
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+</script>
+
+    </main>
+    <footer class="app-footer">
+        <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <span>&copy; 2025 EcoView Imaging</span>
+            <span class="stat">🗺️ Intelligent pathfinding through vegetation</span>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu behavior
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+        const bodyEl = document.body;
+        mobileMenuToggle?.addEventListener('click', () => {
+            mobileNavOverlay.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            bodyEl.classList.toggle('menu-open');
+        });
+        mobileNavOverlay?.addEventListener('click', (e) => {
+            if (e.target === mobileNavOverlay) {
+                mobileNavOverlay.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                bodyEl.classList.remove('menu-open');
+            }
+        });
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                mobileNavOverlay.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                bodyEl.classList.remove('menu-open');
+            });
+        });
+    </script>
+
+</body>
+</html>

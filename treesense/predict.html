@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/assets/css/theme.css">
+    <script src="/src/assets/js/database.js"></script>
+    <title>Dashboard - EcoView Imaging</title>
+
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.toggle-buttons {
+    margin-top: 10px;
+}
+
+.toggle-buttons button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.iframe-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="container app-header-inner">
+            <a class="brand" href="/index.html">
+                <div class="brand-icon">
+                    <img src="/images/treeicon.png" alt="EcoView Imaging logo">
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">EcoView</span>
+                    <span class="brand-tagline">Imaging</span>
+                </div>
+            </a>
+            
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <nav class="nav">
+                <div class="nav-items">
+                    <a href="/predict.html" class="nav-item active">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="/settings.html" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="mobile-nav-overlay">
+            <nav class="mobile-nav">
+                <a href="/predict.html" class="mobile-nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/settings.html" class="mobile-nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+    <main class="container" style="padding: 24px 0 40px;">
+        <div class="card section" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;">
+            <button class="btn" id="detection-button">🌳 Tree Count</button>
+            <button class="btn" id="segmentation-button">🌱 Green Cover</button>
+            <button class="btn" id="species-button">🔬 Species ID</button>
+            <button class="btn" id="path-button">🗺️ Path Planning</button>
+            <button class="btn" id="historical-button">📊 History</button>
+        </div>
+        <div class="card" style="margin-top: 16px;">
+            <iframe id="model-iframe" style="width:100%;height:70vh;border:0;border-radius:12px;" src="dist/index.html"></iframe>
+        </div>
+    </main>
+    <footer class="app-footer">
+        <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <span>&copy; 2025 EcoView Imaging</span>
+            <span class="stat">📊 Unified environmental analytics</span>
+        </div>
+    </footer>
+    <script>
+        // Mobile menu functionality (consistent with index)
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+        const bodyEl = document.body;
+        mobileMenuToggle?.addEventListener('click', () => {
+            mobileNavOverlay.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            bodyEl.classList.toggle('menu-open');
+        });
+        mobileNavOverlay?.addEventListener('click', (e) => {
+            if (e.target === mobileNavOverlay) {
+                mobileNavOverlay.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                bodyEl.classList.remove('menu-open');
+            }
+        });
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                mobileNavOverlay.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                bodyEl.classList.remove('menu-open');
+            });
+        });
+        const currentPage = window.location.pathname.split('/').pop() || 'predict.html';
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const href = item.getAttribute('href');
+            if (href && href.includes(currentPage)) {
+                item.classList.add('active');
+            }
+        });
+        const detectionButton = document.getElementById('detection-button');
+const segmentationButton = document.getElementById('segmentation-button');
+const speciesButton = document.getElementById('species-button');
+const pathButton = document.getElementById('path-button');
+const historicalButton = document.getElementById('historical-button');
+const modelIframe = document.getElementById('model-iframe');
+
+detectionButton.addEventListener('click', () => {
+    modelIframe.src = 'dist/index.html';
+});
+
+segmentationButton.addEventListener('click', () => {
+    modelIframe.src = 'object_segmentation.html';
+});
+
+speciesButton.addEventListener('click', () => {
+    modelIframe.src = 'tree_species.html';
+});
+
+pathButton.addEventListener('click', () => {
+    modelIframe.src = 'optimal_path.html';
+});
+
+historicalButton.addEventListener('click', () => {
+    modelIframe.src = 'historical_data.html';
+});
+
+        // Inject tree count overlay for the dist tree-count UI without changing its code
+        function setupTreeCountOverlay() {
+            try {
+                const iframe = document.getElementById('model-iframe');
+                const win = iframe.contentWindow;
+                const doc = iframe.contentDocument || win.document;
+                if (!doc) return;
+
+                // Avoid duplicate injection
+                if (doc.getElementById('ecoview-tree-counter')) return;
+
+                // Create overlay
+                const counter = doc.createElement('div');
+                counter.id = 'ecoview-tree-counter';
+                counter.textContent = 'Detected Trees: 0';
+                counter.style.position = 'fixed';
+                counter.style.left = '16px';
+                counter.style.bottom = '16px';
+                counter.style.background = 'rgba(0,0,0,0.6)';
+                counter.style.color = '#feda6a';
+                counter.style.padding = '8px 12px';
+                counter.style.border = '1px solid rgba(254,218,106,0.5)';
+                counter.style.borderRadius = '10px';
+                counter.style.fontWeight = '700';
+                counter.style.zIndex = '9999';
+                counter.style.backdropFilter = 'blur(6px)';
+                doc.body.appendChild(counter);
+
+                // Only draw/count boxes that meet the minimum confidence threshold
+                const MIN_CONFIDENCE = 0.35;
+                const ctxProto = win.CanvasRenderingContext2D?.prototype;
+                if (!ctxProto || win.__ecoviewCanvasPatched) {
+                    return;
+                }
+
+                const originalStrokeRect = ctxProto.strokeRect;
+                const originalFillRect = ctxProto.fillRect;
+                const originalFillText = ctxProto.fillText;
+                const quantize = (n) => Math.round(n);
+                const boxSet = new Set();
+                let rafPending = false;
+
+                function updateCounter() {
+                    counter.textContent = `Detected Trees: ${boxSet.size}`;
+                    boxSet.clear();
+                    rafPending = false;
+                }
+
+                function scheduleCounterUpdate() {
+                    if (!rafPending) {
+                        rafPending = true;
+                        win.requestAnimationFrame(updateCounter);
+                    }
+                }
+
+                function drawPending(ctx) {
+                    if (ctx.__ecoviewPendingStroke) {
+                        originalStrokeRect.apply(ctx, ctx.__ecoviewPendingStroke.args);
+                        ctx.__ecoviewPendingStroke = null;
+                    }
+                    if (ctx.__ecoviewPendingFill) {
+                        const prevFill = ctx.fillStyle;
+                        ctx.fillStyle = ctx.__ecoviewPendingFill.fillStyle;
+                        originalFillRect.apply(ctx, ctx.__ecoviewPendingFill.args);
+                        ctx.fillStyle = prevFill;
+                        ctx.__ecoviewPendingFill = null;
+                    }
+                }
+
+                function dropPending(ctx) {
+                    ctx.__ecoviewPendingStroke = null;
+                    ctx.__ecoviewPendingFill = null;
+                }
+
+                ctxProto.strokeRect = function(x, y, w, h) {
+                    // Delay drawing so we can decide after reading confidence label
+                    this.__ecoviewPendingStroke = { args: [x, y, w, h] };
+                };
+
+                ctxProto.fillRect = function(x, y, w, h) {
+                    if (h <= 30 && w <= 250) {
+                        this.__ecoviewPendingFill = { args: [x, y, w, h], fillStyle: this.fillStyle };
+                        return;
+                    }
+                    return originalFillRect.call(this, x, y, w, h);
+                };
+
+                ctxProto.fillText = function(text, x, y, ...rest) {
+                    const textStr = typeof text === 'string' ? text : `${text}`;
+                    const match = textStr.match(/(\d+(?:\.\d+)?)%/);
+                    if (match) {
+                        const confidence = parseFloat(match[1]) / 100;
+                        if (confidence >= MIN_CONFIDENCE) {
+                            const rectArgs = this.__ecoviewPendingStroke?.args;
+                            drawPending(this);
+                            if (rectArgs) {
+                                const [rx, ry, rw, rh] = rectArgs;
+                                const key = `${quantize(rx)}_${quantize(ry)}_${quantize(rw)}_${quantize(rh)}`;
+                                boxSet.add(key);
+                                scheduleCounterUpdate();
+                            }
+                            return originalFillText.call(this, textStr, x, y, ...rest);
+                        }
+                        dropPending(this);
+                        return;
+                    }
+
+                    drawPending(this);
+                    return originalFillText.call(this, textStr, x, y, ...rest);
+                };
+
+                win.__ecoviewCanvasPatched = true;
+            } catch (e) {
+                // Cross-origin or timing issues; ignore
+            }
+        }
+
+        function maybeInjectOnLoad() {
+            const iframe = document.getElementById('model-iframe');
+            if (!iframe) return;
+            const src = iframe.getAttribute('src') || '';
+            if (src.includes('dist/index.html')) {
+                // Delay a bit for app mount
+                setTimeout(setupTreeCountOverlay, 600);
+            }
+        }
+
+        // Inject when iframe loads or when we switch back to tree count
+        document.getElementById('model-iframe').addEventListener('load', maybeInjectOnLoad);
+        maybeInjectOnLoad();
+
+    </script>
+</body>
+</html>

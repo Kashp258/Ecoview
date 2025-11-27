@@ -2,18 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tree Enumeration</title>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-    <link rel="stylesheet" href="/src/assets/css/predict.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/assets/css/theme.css">
+    <link rel="stylesheet" href="/src/assets/css/forest-features.css">
+    <style>
+        .embed-mode .app-header,
+        .embed-mode .app-footer { display: none; }
+        .embed-mode main.container { padding-top: 0 !important; }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(79, 127, 71, 0.3);
+        }
+        #uploadInput {
+            display: none;
+        }
+        .forest-upload-wrapper {
+            margin: 24px auto;
+            max-width: 600px;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Tree Enumeration</h1>
-    </header>
-    <main>
-        <input id="uploadInput" type="file"/>
-        <canvas></canvas>
-        <div id="objectCount" style="position:fixed;left:16px;bottom:16px;background:rgba(0,0,0,0.6);color:#feda6a;padding:8px 12px;border-radius:10px;font-weight:700;border:1px solid rgba(254,218,106,0.5);backdrop-filter: blur(6px);z-index:10;">Detected Trees: 0</div>
+<body class="forest-feature-page">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('embed-mode');
+        }
+    </script>
+
+    <!-- Forest Background Elements -->
+    <div class="forest-silhouette left"></div>
+    <div class="forest-silhouette right"></div>
+    <div class="forest-particles" id="forestParticles"></div>
+
+    <main class="container" style="padding: 24px 0 40px; position: relative; z-index: 3;">
+        
+        <!-- Feature Header -->
+        <div class="forest-feature-header">
+            <div class="forest-header-bar">
+                <svg class="forest-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/>
+                </svg>
+                <h1 class="forest-header-title">Tree Enumeration</h1>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="forest-content-card">
+            <div class="forest-upload-wrapper">
+                <label class="forest-upload-area" for="uploadInput">
+                    <svg class="forest-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <div class="forest-upload-text">Upload Image for Tree Detection</div>
+                    <div class="forest-upload-hint">JPG, PNG, WEBP supported</div>
+                    <input type="file" id="uploadInput" accept="image/*">
+                </label>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px;">
+                <canvas style="display: none;"></canvas>
+            </div>
+        </div>
+
+        <div id="objectCount" style="position:fixed;left:16px;bottom:16px;background:rgba(15,26,18,0.85);backdrop-filter:blur(10px);color:#7BC66A;padding:12px 20px;border-radius:12px;font-weight:700;font-size:15px;border:2px solid rgba(123,198,106,0.4);box-shadow:0 8px 20px rgba(0,0,0,0.3),0 0 20px rgba(123,198,106,0.2);z-index:9999;">Detected Trees: 0</div>
         <script>
             // ... Your existing JavaScript code ...
        /**
@@ -278,6 +339,42 @@
             // ... Rest of your code ...
       
           </script>
+        <script>
+            // Initialize forest particles
+            function initForestParticles() {
+                const particlesContainer = document.getElementById('forestParticles');
+                if (!particlesContainer) return;
+                
+                const particleCount = 18;
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'forest-particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 35 + 's';
+                    particle.style.animationDuration = (30 + Math.random() * 20) + 's';
+                    const size = 5 + Math.random() * 4;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Update canvas display
+            const originalDraw = draw_image_and_boxes;
+            draw_image_and_boxes = function(file, boxes) {
+                originalDraw(file, boxes);
+                const canvas = document.querySelector("canvas");
+                if (canvas) {
+                    canvas.style.display = "block";
+                    canvas.style.margin = "24px auto";
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initForestParticles();
+            });
+        </script>
     </main>
 </body>
 </html>
